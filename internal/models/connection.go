@@ -41,7 +41,7 @@ type ConnectionConfig struct {
 	SSHConfig *SSHConfig        `yaml:"ssh,omitempty"`
 	SSLConfig *SSLConfig        `yaml:"ssl,omitempty"`
 	Extra     map[string]string `yaml:"extra,omitempty"`
-	Timeout   time.Time         `yaml:"timeout"`
+	Timeout   time.Duration     `yaml:"timeout"`
 	MaxOpen   int               `yaml:"max_open"`
 	MaxIdle   int               `yaml:"max_idle"`
 	Color     string            `yaml:"color"`
