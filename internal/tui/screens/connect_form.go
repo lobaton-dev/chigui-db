@@ -3,6 +3,7 @@ package screens
 import (
 	"crypto/md5"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -68,13 +69,27 @@ func NewConnectForm(cfg *config.Manager, bus *tui.EventBus, _ any) *ConnectForm 
 func (m *ConnectForm) Init() tea.Cmd { return m.form.Init() }
 
 func (m *ConnectForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.String() == "esc" {
+			return m, func() tea.Msg {
+				return tui.NavigateToMsg{Screen: tui.ConnectFormScreen}
+			}
+		}
+	}
+
 	form, cmd := m.form.Update(msg)
 	m.form = form.(*huh.Form)
 
 	if m.form.State == huh.StateCompleted {
-		cfg := m.buildConfig()
+		cfg, err := m.buildConfig()
+		if err != nil {
+			return m, func() tea.Msg {
+				return tui.NavigateToMsg{Screen: tui.ConnectionsScreen}
+			}
+		}
 		m.config.AddConnection(cfg)
-		m.config.Save()
+		_ = m.config.Save()
 
 		return m, func() tea.Msg {
 			return tui.NavigateToMsg{Screen: tui.ConnectionsScreen}
@@ -83,11 +98,12 @@ func (m *ConnectForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *ConnectForm) buildConfig() *models.ConnectionConfig {
+func (m *ConnectForm) buildConfig() (*models.ConnectionConfig, error) {
 	id := fmt.Sprintf("%x", md5.Sum(fmt.Appendf(nil, "%s:%s:%s", m.dbType, m.host, m.database)))
-	port := 0
-	fmt.Sscanf(m.port, "%d", &port)
-
+	port, err := strconv.Atoi(m.port)
+	if err != nil {
+		return nil, fmt.Errorf("invalid por %q: %w", m.port, err)
+	}
 	return &models.ConnectionConfig{
 		ID:        id,
 		Name:      m.name,
@@ -102,7 +118,7 @@ func (m *ConnectForm) buildConfig() *models.ConnectionConfig {
 		MaxIdle:   5,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-	}
+	}, nil
 }
 
 func (m *ConnectForm) View() string {
