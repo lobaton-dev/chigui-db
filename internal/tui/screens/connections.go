@@ -53,7 +53,7 @@ func (m *Connections) rebuildList() {
 		isAction:    true,
 	})
 	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
-	l.Title = "Conneection Manager"
+	l.Title = "Connection Manager"
 	l.SetShowHelp(true)
 	m.list = l
 }
