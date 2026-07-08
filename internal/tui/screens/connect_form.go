@@ -73,7 +73,7 @@ func (m *ConnectForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if msg.String() == "esc" {
 			return m, func() tea.Msg {
-				return tui.NavigateToMsg{Screen: tui.ConnectFormScreen}
+				return tui.NavigateToMsg{Screen: tui.ConnectionsScreen}
 			}
 		}
 	}
