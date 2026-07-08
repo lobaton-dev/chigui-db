@@ -76,6 +76,9 @@ func (a *App) Init() tea.Cmd {
 func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case NavigateToMsg:
+		if _, ok := a.screens[msg.Screen]; !ok {
+			return a, nil
+		}
 		a.current = msg.Screen
 		windowMsg := tea.WindowSizeMsg{Width: a.width, Height: a.height}
 		if s, ok := a.screens[a.current]; ok {
