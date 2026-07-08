@@ -105,11 +105,9 @@ func (m *Connections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return tui.NavigateToMsg{Screen: tui.ConnectFormScreen}
 				}
 			}
-			// Fase 1: mock — navegar directo al browser
 			return m, func() tea.Msg {
 				return tui.NavigateToMsg{Screen: tui.BrowserScreen}
 			}
-			// Fase 2: reemplazar por pool.Connect + ConnSelectedMsg
 		case "d":
 			// Delete connection
 			item, ok := m.list.SelectedItem().(connItem)
@@ -118,6 +116,7 @@ func (m *Connections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.config.RemoveConnection(item.config.ID)
 			m.rebuildList()
+			m.list.SetSize(m.width-4, m.height-4)
 			return m, nil
 		case "esc":
 			return m, func() tea.Msg {
