@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/lobaton-dev/chigui-db/internal/config"
 	"github.com/lobaton-dev/chigui-db/internal/tui"
+	"github.com/lobaton-dev/chigui-db/internal/tui/screens"
 )
 
 var version = "0.1.0"
@@ -56,6 +57,17 @@ Controls:
 		Registry: nil, // *drivers.Registry — Fase 2
 		Session:  session,
 	})
+
+	bus := app.Bus()
+	app.RegisterScreen(tui.WelcomeScreen, screens.NewWelcome(cfg, bus))
+	app.RegisterScreen(tui.ConnectionsScreen, screens.NewConnections(cfg, bus, nil))
+	app.RegisterScreen(tui.ConnectFormScreen, screens.NewConnectForm(cfg, bus, nil))
+	app.RegisterScreen(tui.BrowserScreen, screens.NewBrowser(cfg, bus))
+	app.RegisterScreen(tui.EditorScreen, screens.NewEditor(cfg, bus))
+	app.RegisterScreen(tui.GridScreen, screens.NewGrid(cfg, bus))
+	app.RegisterScreen(tui.HistoryScreen, screens.NewHistory(cfg, bus))
+	app.RegisterScreen(tui.ExportScreen, screens.NewExport(cfg, bus))
+	app.RegisterScreen(tui.ERDScreen, screens.NewERD(cfg, bus))
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)

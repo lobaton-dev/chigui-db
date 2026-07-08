@@ -42,6 +42,22 @@ func NewConnections(cfg *config.Manager, bus *tui.EventBus, _ any) *Connections 
 	}
 }
 
+func (m *Connections) rebuildList() {
+	items := make([]list.Item, 0)
+	for _, connCfg := range m.config.GetConfig().Connections {
+		items = append(items, connItem{config: connCfg})
+	}
+	items = append(items, connItem{
+		title:       "New Connection...",
+		description: "Add a new database connection",
+		isAction:    true,
+	})
+	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	l.Title = "Connection Manager"
+	l.SetShowHelp(true)
+	m.list = l
+}
+
 type connItem struct {
 	config      *models.ConnectionConfig
 	title       string
@@ -74,6 +90,7 @@ func (m *Connections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.rebuildList()
 		m.list.SetSize(msg.Width-4, msg.Height-4)
 		return m, nil
 	case tea.KeyMsg:
@@ -88,11 +105,9 @@ func (m *Connections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return tui.NavigateToMsg{Screen: tui.ConnectFormScreen}
 				}
 			}
-			// Fase 1: mock — navegar directo al browser
 			return m, func() tea.Msg {
 				return tui.NavigateToMsg{Screen: tui.BrowserScreen}
 			}
-			// Fase 2: reemplazar por pool.Connect + ConnSelectedMsg
 		case "d":
 			// Delete connection
 			item, ok := m.list.SelectedItem().(connItem)
@@ -100,7 +115,13 @@ func (m *Connections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.config.RemoveConnection(item.config.ID)
+			m.rebuildList()
+			m.list.SetSize(m.width-4, m.height-4)
 			return m, nil
+		case "esc":
+			return m, func() tea.Msg {
+				return tui.NavigateToMsg{Screen: tui.WelcomeScreen}
+			}
 		}
 	}
 	var cmd tea.Cmd

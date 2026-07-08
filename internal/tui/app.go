@@ -61,6 +61,14 @@ func NewApp(cfg AppConfig) *App {
 	}
 }
 
+func (a *App) RegisterScreen(s Screen, m tea.Model) {
+	a.screens[s] = m
+}
+
+func (a *App) Bus() *EventBus {
+	return a.bus
+}
+
 func (a *App) Init() tea.Cmd {
 	return nil
 }
@@ -68,7 +76,16 @@ func (a *App) Init() tea.Cmd {
 func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case NavigateToMsg:
+		if _, ok := a.screens[msg.Screen]; !ok {
+			return a, nil
+		}
 		a.current = msg.Screen
+		windowMsg := tea.WindowSizeMsg{Width: a.width, Height: a.height}
+		if s, ok := a.screens[a.current]; ok {
+			var cmd tea.Cmd
+			a.screens[a.current], cmd = s.Update(windowMsg)
+			return a, cmd
+		}
 	case tea.WindowSizeMsg:
 		a.width = msg.Width
 		a.height = msg.Height
@@ -78,10 +95,19 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, tea.Quit
 		}
 	}
+
+	if s, ok := a.screens[a.current]; ok {
+		var cmd tea.Cmd
+		a.screens[a.current], cmd = s.Update(msg)
+		return a, cmd
+	}
 	return a, nil
 }
 
 func (a *App) View() string {
+	if s, ok := a.screens[a.current]; ok {
+		return s.View()
+	}
 	return "chiguidb\n"
 }
 

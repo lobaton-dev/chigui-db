@@ -49,7 +49,7 @@ func (m *History) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "esc":
 			return m, func() tea.Msg {
-				return tui.NavigateToMsg{Screen: tui.BrowserScreen}
+				return tui.NavigateToMsg{Screen: tui.WelcomeScreen}
 			}
 		}
 	}

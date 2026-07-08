@@ -72,6 +72,9 @@ func (m *Welcome) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if item.title == "Quit" {
 				return m, tea.Quit
 			}
+			return m, func() tea.Msg {
+				return tui.NavigateToMsg{Screen: item.screen}
+			}
 		}
 	}
 	var cmd tea.Cmd
