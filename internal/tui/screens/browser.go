@@ -97,6 +97,10 @@ func (m *Browser) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, func() tea.Msg {
 				return tui.NavigateToMsg{Screen: tui.ERDScreen}
 			}
+		case "esc":
+			return m, func() tea.Msg {
+				return tui.NavigateToMsg{Screen: tui.WelcomeScreen}
+			}
 		}
 	}
 	return m, nil
