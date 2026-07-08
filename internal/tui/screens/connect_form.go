@@ -102,7 +102,7 @@ func (m *ConnectForm) buildConfig() (*models.ConnectionConfig, error) {
 	id := fmt.Sprintf("%x", md5.Sum(fmt.Appendf(nil, "%s:%s:%s", m.dbType, m.host, m.database)))
 	port, err := strconv.Atoi(m.port)
 	if err != nil {
-		return nil, fmt.Errorf("invalid por %q: %w", m.port, err)
+		return nil, fmt.Errorf("invalid port %q: %w", m.port, err)
 	}
 	return &models.ConnectionConfig{
 		ID:        id,
